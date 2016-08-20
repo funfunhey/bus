@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0" />
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"/>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+
+    <script src="./jquery-1.10.1.min.js"></script>
+    <link type="text/css" rel="stylesheet" href="./css/car.css">
+    <script src="./js/angular-1.4.6.mini.js"></script>
+</head>
+<style>
+    .show {
+        display: block!important;
+    }
+    .hide{
+        display:none;
+    }
+    li{
+        display:block;
+    }
+</style>
+
+<body ng-app="boxApp" ng-controller="boxlist">
+
+    <div class="head">
+        <div class="head-title choose-title certerfont">
+            收藏夹
+        </div>
+        <div class="head-title unchoose-title certerfont" onclick="location.href='neighbour.html'">
+            附近车站
+        </div>
+    </div>
+    <div id="total_fav">
+
+
+        <div class="box  slider" ng-repeat="(k,v) in carfav"   id="box{{v.id}}">
+            <div style="overflow: hidden;height: 100%;">
+
+                <a class="span_title font55 left" href="favdetail.html?name={{v.name}}"><span style="line-height:80px">{{v.name}}</span>
+                    <span style=" font-size: 15px;margin-left: 20px;color:#777;">
+                (支持路线:<span>{{v.support}}</span>)
+                    </span>
+
+                </a>
+
+                <div class="view_more twig-24" ng-click="clickfunc(this,v.id);">&#xe825; </div>
+            </div>
+            <div class="ball-list" id="ball-list{{v.id}}" style="display:none;top:{{t_balllist+v.id*80}}px" id="ball-list">
+                <!-- <div class="ball-roll ball-1 ball  twig-24 ">&#xe80b;</div>
+                <div class="ball-roll2 ball-2  ball twig-24 ">&#xe83e;</div> -->
+                 <div class="ball-roll2 ball-2 ball twig-24 " ng-click="delonefav(v.id)">&#xe824;</div>
+                <div class="ball-roll3 ball-3 ball  twig-24 " ng-click="editfav(v.id)">&#xe836;</div>
+                <div class="ball-roll4 ball-4 ball twig-24 " ng-click="delfav(v.id)">&#xe831;</div>
+
+                
+                <!-- <div class=" twig-24 cancel_more" >&#xe831;</div> -->
+            </div>
+        </div>
+
+    </div>
+
+    <div class="circle twig-24 toinput pinkfont">
+        &#xe834;
+    </div>
+     <div class="circle twig-24 " id="adddata" ng-click="adddata()" style="top:75%;z-index:1">
+        &#xe82c;
+    </div>
+    <div id="inputdiv">
+        <!-- <form action="" method="post" > -->
+        <input type="text" id="searchbox" class="searchtext font40" ng-model="searchtext" ng-keyup="change($event)" />
+        <span class=" twig-24 pinkfont hide" id="cancel_search" > </span>
+        <!-- </form> -->
+
+    </div>
+    <div id="coverout">
+      <div id="cover">
+        <div class="cover-div">
+            <span class="suggestspan font15" id="whatyouwant">您想搜索</span>
+            <div id="covercontent" class="suggestdiv">
+                <ul style="height:300px;overflow:scroll" >
+                    <li ng-repeat="(slk,slv) in searchlist" class="searchlist ">
+                        <a ng-show="slv.Distance==null"  style="color:white" ng-click="tapstaion(slv.Id,slv.SiteName)" class="searchlist2">{{slv.SiteName}}</a>
+                        <a ng-show="slv.LineName"  style="color:white"  class="searchlist2" ng-click="tapline(slv.Id,slv.LineName)">{{slv.LineName}}</a>
+                        <a ng-show="slv.type==1" href="line.html?lineId={{slv.lineId}}" style="color:white" class="searchlist2">{{slk}}</a>
+                        <a ng-show="slv.type==2" href="stationimf.html?siteid={{slv.siteId}}" style="color:white" class="searchlist2">{{slk}}</a>
+                        <span ng-show="slv.type" class=" twig-24 " style="display: inline;color:white" ng-click="delsearch(slk)">&#xe832; </span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="text/javascript" src="js/common.js"></script>
+    <!-- <script type="text/javascript" src="js/drag.js"></script> -->
+    <!-- <script type="text/javascript" src="js/slide.js"></script> -->
+    <script type="text/javascript">
+     //localstorge的数据
+        // {"下班":[{"lineid":150819093028190,"upDown":1,"siteId":1},{"lineid":140724022829709,"upDown":1,"siteId":1}]}
+        bodyheight = document.body.clientHeight;
+        var boxapp = angular.module('boxApp', []);
+        boxapp.controller("boxlist", function ($scope, $http) {
+
+            //获取最近的搜索记录,type1是路线，2是站点名
+            //{'1路':{type:'1',lineId:140724022829709,siteId:0},'陈厝合西':{type:'2',lineId:0,siteId:150911050325733}}
+            var recentSearch = getstorge('rencentSearch')||{};
+            $scope.searchlist = recentSearch;
+            $scope.cardata = cardata = getstorge('cardata')||{};
+            var count=0;
+
+            var cardata_byid = [];
+            // if($scope.cardata.length != $scope.carfav.length){//不同的时候要更新
+
+                $scope.carfav =carfav = [];
+                for (kk in $scope.cardata) {
+                   var support = '';
+                   
+                   if($scope.cardata[kk]){
+                        for(kkk in $scope.cardata[kk]){
+
+                        support += $scope.cardata[kk][kkk]['linename']+',';
+                       }
+                   }
+                   
+
+                   cardata_byid[count] = kk;
+                   carfav[count] = {};
+
+                   // $scope.cardata[kk].id=count++;
+                    carfav[count].support = (support.length>0)?support.slice(0,-1):'暂未添加站点';
+                    carfav[count].name = kk;
+                    carfav[count].id= count++;
+                }
+                $scope.carfav = carfav;
+                setstorge('carfav',carfav);
+            // }
+
+            $scope.t_balllist = 170; //列表的高度
+
+            //点击更多编辑
+            var clicknum = -1; //上一次点击的值
+            $scope.clickfunc = function (t, e) {
+                var hasopen = $('#box' + clicknum).hasClass('m_bottom80');
+
+                if (clicknum >= 0 || (e == clicknum&&hasopen)) {
+                    $('#box' + clicknum).removeClass('m_bottom80');
+                    $('#ball-list' + clicknum).removeClass('show');
+                }
+                if (e != clicknum||!hasopen) {
+                    $('#box' + e).addClass('m_bottom80');
+                    $('#ball-list' + e).addClass('show');
+                }
+                clicknum = e;
+            }
+
+            $scope.editfav = function(num){
+                var thisname = carfav[num]['name'];
+                popalert('<p>修改"'+thisname+'"为<br><input type="text" class="font40" id="editname"  value=""></p>',0,'取消','<span onclick="editfav(\''+thisname+'\','+num+')">确定</span>');
+                //car
+                setstorge();
+            }
+             editfav = function(name,num){
+               var tmpdata =  cardata[name];
+               delete cardata[name];
+               var editname = $('#editname').val();
+               cardata[editname] = tmpdata;
+               carfav[num]['name'] = editname;
+
+               setstorge('carfav',carfav);
+                setstorge('cardata',cardata);
+                $scope.$apply();
+                hidepop(0);
+            }
+            $scope.delfav = function(num){
+                var thisname = carfav[num]['name'];
+                popalert('<p>你确定要删除"'+thisname+'"这个收藏吗？</p>',0,'取消','<span onclick="delfav(\''+thisname+'\','+num+')">确定</span>');
+
+            }
+            delfav = function(name,num){
+                delete cardata[name];
+                delete carfav[num];
+                setstorge('cardata',cardata);
+                setstorge('carfav',carfav);
+                $scope.cardata = cardata;
+                // $scope.$apply(); 
+                window.location.reload();
+            }
+
+            //删除某个收藏其中几项
+            $scope.delonefav = function(num){
+                var thisname = carfav[num]['name'];
+                
+                var tbody = '';
+                for (var ind in $scope.cardata[thisname]) {
+                    var cardata_arr = $scope.cardata[thisname][ind];
+                    
+                    tbody += '<tr style="line-height:35px"><td style="width: 5%;"><input type="checkbox" data-ind="'+ind+'"></td><td style="width: 15%;" id="onefav_linename_'+ind+'">'+cardata_arr['linename']+'</td><td style="width: 45%; "><span style="height: 35px;overflow: hidden;display: block;" id="onefav_span_'+ind+'">'+cardata_arr['favname']+'</span></td>\
+                            <td class=" twig-24" onclick="changefav_ord('+ind+',\''+thisname+'\',1)">&#xe83a;</td><td class=" twig-24" onclick="changefav_ord('+ind+',\''+thisname+'\',0)">&#xe80f;</td></tr>';
+                }
+
+                var table = '<table style="text-align:center;width:100%;padding: 15px;font-size:14px" class="font" id="deltable">\
+                <tbody>'+tbody+'</tbody>\
+                </table>';
+                popalert(table,0,'取消','<span onclick="delonefav(\''+thisname+'\','+num+')">删除</span>');
+            }
+            changefav_ord = function(ind,name,isup){
+                if(isup&&(ind <=0||ind>$scope.cardata[name].length))return false;
+                if(isup&&(ind >=$scope.cardata[name].length|| ind<0 ))return false;
+                var next = isup?ind-1:ind+1;
+                Swap($scope.cardata[name],ind,next);
+                $('#onefav_span_'+ind).text($scope.cardata[name][ind]['favname']);
+                $('#onefav_span_'+next).text($scope.cardata[name][next]['favname']);
+                $('#onefav_linename_'+ind).text($scope.cardata[name][ind]['linename']);
+                $('#onefav_linename_'+next).text($scope.cardata[name][next]['linename']);
+                setstorge('cardata',$scope.cardata);
+                cardata = $scope.cardata;
+               
+                
+            }
+            delonefav = function(name,num){
+                var delinput = $('#deltable input:checked');
+                var perlen  = $scope.cardata[name].length ;
+             
+                var delid = [];
+                delinput.each(function(k){
+                    console.log(delinput[k].getAttribute('data-ind'));
+
+                    delid.push(delinput[k].getAttribute('data-ind'));
+                    
+                   
+                })
+                $scope.cardata[name] = del_one_arr(delid,$scope.cardata[name]);
+                if($scope.cardata[name].length != perlen)alert('删除成功');
+                setstorge('cardata',$scope.cardata);
+                cardata = $scope.cardata;
+                var surpport = '';
+                for(kkk in $scope.cardata[name]){
+                    surpport += $scope.cardata[name][kkk]['linename']+',';
+               }
+               $scope.carfav[num]['support'] = surpport?surpport:'暂未添加站点';
+               $scope.$apply(); 
+            }
+
+            $scope.adddata = function(){
+                var html = '<p>添加收藏<br><input type="text" class="font40" id="addname"  value=""></p>';
+                popalert(html,0,'取消','<span onclick="popplug()">确定</span>');
+            }
+
+            popplug = function(){//重写,全局
+                var addname = $('#addname').val();
+
+                if(typeof(addname) == 'String'){
+                    addname = addname.trim();
+                }
+                if(cardata[addname]){
+                    alert('已有该收藏，添加收藏名失败！');
+                }else{
+                     cardata[addname] = [];
+                    setstorge('cardata',cardata);
+                    hidepop(0);
+                    // $scope.$apply();
+                    window.location.reload();
+                }
+
+            }
+
+
+
+
+            //拿到的是路线时
+            var get_imf_bynum = function (haslu) {
+                    $http.get("car.php?type=2&lineName=" + $scope.searchtext).success(function (response) {
+                        if (response.state == 1) {
+                            console.log(response);
+                            var lines = response.data;
+                            var jlines = JSON.parse(lines);
+                            var jlines_len = jlines.length;
+                            var searchlineId = 0;
+                            if (jlines_len == 1) { //只有一条数据就是对的
+                                searchlineId = jlines[0]['Id'];
+                            } else if (jlines_len == 0) {
+                                alert('没有找到该路线');
+                            } 
+                            if (searchlineId > 0) {
+                                setstorge('rencentSearch',{type:'1',lineId:searchlineId,siteId:0},$scope.searchtext);
+
+                                // location.href = "line.html?lineId=" + searchlineId;
+                            }else{
+                                $scope.searchlist = jlines;
+                            }
+                            $('#whatyouwant').text('您想搜索');
+                            $scope.searchlist = jlines;
+                        } else {
+                            alert(response.tips);
+                        }
+
+                    })
+                }
+                //取得地址名
+            var get_imf_byname = function () {
+                    $http.get("car.php?type=7&siteName=" + $scope.searchtext).success(function (response) {
+                        if (response.state == 1) {
+
+                            var lines = response.data;
+                            var jlines = JSON.parse(lines);
+                            var jlines_len = jlines.length;
+                            var searchlineId = 0;
+                            if (jlines_len == 0) {
+                                // alert('没有找到该路线');
+                            } else {
+                               $scope.searchlist = jlines;
+                                console.log(jlines);
+                            }
+                            $('#whatyouwant').text('您想搜索');
+                        } else {
+                           $('#whatyouwant').text('暂无数据');
+                        }
+
+                    })
+                }
+
+            $scope.tapstaion =function(siteid,sitename){
+                setstorge('rencentSearch',{type:'2',lineId:0,siteId:siteid},sitename);//添加到最近查询
+                location.href = "stationimf.html?siteid="+siteid;
+            }
+            $scope.tapline=function(lineid,line){
+                setstorge('rencentSearch',{type:'2',lineId:lineid,siteId:0},line);//添加到最近查询
+                location.href = "line.html?lineId="+lineid;
+            }
+
+            $scope.delsearch = function(name){
+                delstorge('rencentSearch',name);
+                $scope.searchlist = getstorge('rencentSearch')||{};
+            }
+
+            getrecent = function(){
+               $scope.searchlist = getstorge('rencentSearch')||{};
+               $scope.$apply();
+            }
+        
+
+
+
+            //当搜索确定时跳转
+            var overtime;
+            $scope.change = function (e) {
+                var keycode = window.event ? e.keyCode : e.which;
+                if(typeof(overtime) != 'undefined'){
+                    clearTimeout(overtime);
+                    $('#whatyouwant').text('您想搜索');
+                }
+
+                //延迟请求
+                var overtimefunc =function(){
+                    // 提示语
+                    $('#whatyouwant').text('正在为您搜索....');
+                    var testnum = /^[0-9A-z]+$/.test($scope.searchtext);
+                    if (testnum ) { //搜索，两种情况，一种是当搜索路线名时，一种是搜索位置
+                        var haslu;
+                        if (haslu = /^\d+路$/.test($scope.searchtext) || testnum) {
+                            get_imf_bynum(haslu);
+                        }
+
+                    }else if(!testnum &&$scope.searchtext!=''&& typeof($scope.searchtext)=='string'){//不是数字，即不是几路
+                        get_imf_byname();
+                        lasttext = $scope.searchtext;
+                    }else{
+                        $scope.searchlist =recentSearch;
+                        $scope.$apply();
+                        $('#whatyouwant').text('你想搜索');
+                    }
+                    
+                }
+                overtime = setTimeout(overtimefunc,1200);
+             
+
+
+            }
+
+        });
+        
+
+        //[{"id":1,'name':"上班","linenums":"1,32,47"},{"id":2,'name':"下班","linenums":"1,32,47"}]
+    </script>
+</body>
+
+</html>

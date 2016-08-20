@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"/>
+    <script src="./jquery-1.10.1.min.js"></script>
+    <link type="text/css" rel="stylesheet" href="./css/car.css">
+<script src="./js/angular-1.4.6.mini.js"></script>
+<script type="text/javascript" src="js/getpos.js"></script>
+</head>
+<style>
+    .show{
+        display:block!important;
+    }
+</style>
+<body ng-app="boxApp" ng-controller="boxlist">
+
+    <div class="head">
+        <div class="head-title certerfont" onclick="location.href='home.html'">
+            收藏夹
+        </div>
+        <div class="head-title certerfont choose-title ">
+            附近车站
+        </div>
+    </div>
+    <div id="total_fav" >
+
+
+        <div class="box  slider"   ng-repeat="(k,v) in stations"  id="box{{k}}" >
+
+
+            <a href="stationimf.html?siteid={{v.Id}}" style="text-decoration:none;">
+                <div class="span_title font55 left" style="width: 75%;"><span style="line-height:80px;">{{v.SiteName}}</span>
+               <!-- <span style=" font-size: 40px;margin-left: 50px;color:#777;">
+                (支持路线:<span>{{v.linenums}}</span>)
+                </span> -->
+
+                </div>
+                <div class="view_more " >{{v.Distance|number: 0}}米</div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="circle twig-24 tohome">
+        <a href="home.html" class="fontpink">  &#xe81b;</a>
+    </div>
+   <!--  <div class="circle twig-24 " style="top:75%;z-index:1">
+        &#xe81f;
+    </div> -->
+    <div id="inputdiv">
+    <!-- <form action="" method="post" > -->
+       <input type="text" class="searchtext font40" ng-model="searchtext" ng-keyup="change($event)"/>
+       <span class=" twig-24 purple" id="cancel_search"> </span>
+    <!-- </form> -->
+
+    </div>
+    
+ <script type="text/javascript">
+        var boxapp = angular.module('boxApp',[]);
+        
+       
+        boxapp.controller("boxlist",function($scope,$http){
+                //获取用户ip
+
+                // var get_client_ip = function(){
+                //         $http.get("car.php?type=5").success(function(response){
+                //             if(response.state ==1){
+                //                 console.log(response);
+                //                 var lines = response.data;
+                //                 var jlines = JSON.parse(lines);
+                //                 youraddress.x = jlines.content.point.x;
+                //                 youraddress.y = jlines.content.point.y;
+                //                 get_neighbour();
+                //                console.log(youraddress);
+                //             }else{
+                //                 alert(response.tips);
+                //             }
+
+                //         })
+                // }
+                var get_client_ip =function(){
+                    setTimeout(get_neighbour,800);
+                }
+                var get_neighbour = function(){//获取附近站点
+                  
+                    $http.get("car.php?type=6&latx="+youraddress.x+"&laty="+youraddress.y).success(function(response){
+                            if(response.state ==1){
+                                
+                                var lines = response.data;
+                                var jlines = JSON.parse(lines);
+                                $scope.stations = jlines;
+
+                            }else{
+                                alert(response.tips);
+                            }
+
+                        })
+                }
+                get_client_ip();
+
+
+
+
+                
+
+
+
+        });
+
+    </script>
+    </body>
+    </html>

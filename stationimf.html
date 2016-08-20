@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"/>
+        <base href="car" />
+        <link type="text/css" rel="stylesheet" href="./css/car.css">
+        <link type="text/css" rel="stylesheet" href="./css/detail.css">
+        <script src="./jquery-1.10.1.min.js"></script>
+        <script src="./js/angular-1.4.6.mini.js"></script>
+        <style>
+            .red{
+                color:red;
+            }
+          
+
+        </style>
+    </head>
+
+    <body  ng-app="bodyApp" ng-controller="bodylist">
+
+    <div class="head2 font55  middlefont">
+        <a href="javascript:history.back(-1);" class="certerfont" style="width:15%">
+        <img src="images/a3.png"  style="width: 8px;"></a>
+        <div class="certerfont" style="width:70%">
+            <span >{{fav.favname}}</span><a class="twig-24 "  ng-click="changedirect()"> &#xe820;</a>
+        </div>
+        
+        <span class="twig-24 " style="width:15%">&#xe81a;</span>
+    </div>
+    <div  id="content-1" ng-repeat="(lk,lv) in linelist" ng-click="click = !click" class="content {{tocolorClass[lk]}}"ng-class="{showheight:click}" >
+        <!-- <div class="color_div {{linecolorClass[lk]}}"></div> -->
+        <div class="left_div">
+            <h4 class="">{{lv.LineName}} </h4>
+            <div class="font40 leftpadding18">
+
+                <p style="margin-bottom:10px">time:</p>
+                <span ng-show="updown==1">{{lv.UpStartTime}} ~ {{lv.UpEndTime}}</span>
+                <span ng-show="updown==2">{{lv.DownStartTime}} ~ {{lv.DownEndTime}}</span>
+            </div>
+       
+        </div>
+        <div  class="right_div">
+            <div class="right_div_depart">
+                <!-- <div style="width:10px;float:left;padding:0 20px 0 20px">。<br>|<br>。</div> -->
+                <div class="right_line">
+                    <div class="circle_top " style="margin-top:10px;"></div> 
+                    <div class="line1"></div>
+                    <div class="circle_top "></div>
+
+                </div>
+                 
+                <div style="height: 100%">
+                    <p class="left_sp" style="padding-top: 5%"  ng-show="updown==1">{{lv.StartEndSites[0]['Seq']==1?lv.StartEndSites[0]['SiteName']:lv.StartEndSites[1]['SiteName']}}</p>
+                    <p class="left_sp" ng-show="updown==2">{{lv.StartEndSites[0]['Seq']==1?lv.StartEndSites[1]['SiteName']:lv.StartEndSites[0]['SiteName']}}</p>
+                    
+                    <p class="" ng-show="updown==1">{{lv.StartEndSites[0]['Seq']==1?lv.StartEndSites[1]['SiteName']:lv.StartEndSites[0]['SiteName']}}</p>
+                    <p class="" ng-show="updown==2">{{lv.StartEndSites[0]['Seq']==1?lv.StartEndSites[0]['SiteName']:lv.StartEndSites[1]['SiteName']}}</p>
+                </div>
+            </div>
+            <div class="right_div_depart right_div_depart_down">
+                <div class="right_div_down_left">
+                    <h4 class=" " >To</h4>
+               
+                    <h5>{{fav.favname}}</h5>
+                </div>
+                <div class="right_div_down_mid">
+                    <h4 class=" " >next</h4>
+                    <h5>{{station[lv.Id].FirstBus}}站</h5>
+                </div>
+                <div class="right_div_down_mid">
+                    <h4 class="  " >next2</h4>
+                    <h5>{{station[lv.Id].SecondBus}}站</h5>
+                </div>
+                <!-- <div></div> -->
+            </div>
+        </div>
+        <div class="stationdiv"  ng-class="{showdetail:click}">
+        <ul class="station" style="width:{{stationCount[lv.Id]}}px"  >
+           
+            <li ng-repeat="x in station[lv.Id]['List']" >
+            <span class="twig-24 favit" id="station_{{lv.Id}}_{{x.SiteId}}" ng-click="favit(lk,lv.Id,x.SiteId,$event,lv.LineName,x.SiteName)">&#xe835;</span>
+          
+            <p ng-class="{choosed:x.BusList.length>0}">{{x.SiteName}}{{(x.BusList.length>1)? x.BusList.length:""}}<br><span class="twig-24" ng-show="x.BusList.length>0" ng-click="showcar(x.LineId,x.SiteId,$event)" >&#xe80c;</span>
+            <div class="hide site" id="carname{{x.LineId}}-{{x.SiteId}}">
+                <span ng-repeat="bl in x.BusList" class="showcar">
+                {{bl}}</span>
+            </div>
+            </p></li>
+
+            </ul>
+       
+        </div>
+    </div>
+    <div class="circle twig-24 tohome font15">
+      <a onclick="window.location='home.html'" class="fontpink">  &#xe81b;</a>
+    </div>
+    <div class="roll hide" id="roll" >
+        <div class="rollstate">
+        <span style="left: 50px;"  class="stateline" ng-click="cancel_roll()">取消</span>
+        <span class="favname" data-lineid="{{collect.lineid}}" data-siteid="{{collect.siteid}}">{{collect.linename}}-{{collect.sitename}}</span>
+        <span style="right: 50px;" class="stateline" ng-click="confirmcollect()">确定</span>
+        </div>
+        <div class="topcover"></div>
+        <!-- <div class="bottomcover"></div> -->
+        <ul onscroll="scrollfunc(this,event)">
+
+            <li id="li0">&nbsp;</li>
+            <li ng-repeat="(cfk,cfv) in  carfav" id="li{{cfk+1}}">{{cfv.name}}</li>
+            <li id="li{{carfavlen+1}}">&nbsp;</li>
+            <li id="li{{carfavlen+2}}">&nbsp;</li>
+        </ul>
+    </div>
+
+    <script type="text/javascript" src="js/common.js"></script>
+    <script>
+    // -webkit-transform: translateZ(-50px) rotateX(45deg);
+    // -moz-transform: translateZ(-50px) rotateY(45deg);
+    // -o-transform: translateZ(-50px) rotateY(45deg);
+    // transform: translateZ(-50px) rotateY(45deg);
+        var collectname = '';
+        var storge ={
+            carfav:getstorge('carfav'),
+            cardata:getstorge('cardata'),
+            carfavlen:getstorge('carfav').length
+        }
+
+
+        var lidom=[];
+        var makelidom = function(){
+            if(lidom.length==0){
+                for(i=0;i<storge.carfavlen+3;i++){
+                    lidom.push($('#li'+i));
+                }
+            }
+        }
+
+        var scrollfunc = function(e,ee){
+            makelidom();
+            console.log(e);
+            var lastpos = e.scrollTop;
+            var move = 50;
+            var timefunc = setTimeout(function(){
+                if(lastpos == e.scrollTop){//停止了滚动
+                    var midpos = Math.round((lastpos/move));
+                    e.scrollTop=Math.round(midpos*move);
+                    collectit.collectname = lidom[midpos+1].text();
+                    console.log(midpos+1);
+                    
+                }else{
+                    timefunc;
+                }
+                console.log(e.scrollTop+'...');
+            }, 100);
+            var midpos2 = Math.round((lastpos/move))+1;
+            for (var i = 1; i <storge.carfavlen+2; i++) {
+                lidom[i].css({
+                'font-size':'13px',
+                'color':'gray'
+                });
+            }
+            var nearpos = midpos2-1;
+            lidom[nearpos].css({
+                'font-size':'13px',
+                'color':'gray'
+            });
+            nearpos2 = midpos2+1;
+            lidom[nearpos2].css({
+                'font-size':'13px',
+                'color':'gray'
+            });
+
+            lidom[midpos2].css({
+                'font-size':'15px',
+                'color':'black'
+            });
+
+        }
+
+        
+        var bodyapp = angular.module('bodyApp', []);
+        bodyapp.config(['$locationProvider', function($locationProvider) {  
+          $locationProvider.html5Mode(true);  
+        }]);
+        bodyapp.controller("bodylist",function($scope,$http,$location){
+            //var urlname = $location.search().name;
+            $scope.siteid = siteid = $location.search().siteid;
+            $scope.isup = ($scope.updown==1);
+
+            $scope.updown = $location.search().updown||1;
+            $scope.changeupdown = $scope.updown==1?2:1;
+            $scope.changedirect = function(){
+                console.log($scope.updown);
+                if($scope.updown == 1){
+                    $scope.updown  =2;
+                    $scope.changeupdown = 1;
+                }else{
+                    $scope.updown  =1;
+                    $scope.changeupdown = 2;
+                }
+                $scope.stationCount ={};
+                $scope.station = {};
+                $scope.linecolorClass = new Array();
+                $scope.tocolorClass = new Array(),$scope.next={},$scope.next2={};
+                var linenum =$scope.linelist.length;
+                for(i=0;i<linenum;i++){
+                    get_line_detail();
+                }
+                
+            }
+            var get_line_detail = function(){
+               // if(typeof(linelist[i].upDown)=='undefined') $scope.updown=1;
+                $http.get("car.php?lineId="+linelist[i].Id+"&upDown="+$scope.updown+"&siteId="+siteid+"&type=1").success(function(response){
+                        if(response.state ==1){
+                            var list = response.data;
+                            var jlist = JSON.parse(list);
+                            var id = jlist.LineId;
+
+                            $scope.station[id]=jlist;
+                            $scope.stationCount[id] = 32*jlist.List.length;
+                            $scope.next[id] = 0;
+                            $scope.next2[id] = 0;
+                            var station = $scope.station;
+                            console.log(!$scope.fav);
+                          //取出第一组数据获得该站点名称   
+                          if(!$scope.fav){
+                                var jlistlist = jlist.List;
+                                for (ii in jlistlist) {
+                                    if(jlistlist[ii]['SiteId']==siteid){
+                                        $scope.fav ={favname:jlistlist[ii]['SiteName']};
+                                        break;
+                                    }
+                                }
+                                
+                          }
+                           
+                         
+                        }else{
+                            alert(response.tips);
+                        }
+                        
+                    })
+
+              switch(i%3){
+                case 0:
+                $scope.linecolorClass.push("color_yellow");
+                $scope.tocolorClass.push("cyellow");
+
+                break;
+                case 1:
+                $scope.linecolorClass.push("color_purple");
+                $scope.tocolorClass.push("cpurple");
+                break;
+                case 2:
+                $scope.linecolorClass.push("color_green");
+                $scope.tocolorClass.push("cgreen");
+                break;
+              }
+            }
+            var get_all_line = function(){
+                $http.get("car.php?siteId="+siteid+"&type=4").success(function(response){
+                        if(response.state ==1){
+                            var list = response.data;
+                            var jlist = JSON.parse(list);
+                            /*var id = jlist.LineId;
+
+                            $scope.station[id]=jlist.List;
+                            $scope.next[id] = 0;
+                            $scope.next2[id] = 0;*/
+                            $scope.linelist = linelist = jlist;
+                            var station = $scope.station;
+                            var linenum = linelist.length;
+                            $scope.stationCount ={};
+                            $scope.station = {};
+                            $scope.linecolorClass = new Array();
+                            $scope.tocolorClass = new Array(),$scope.next={},$scope.next2={};
+                            for(i=0;i<linenum;i++){
+                                get_line_detail();
+                            }
+
+                
+                        }else{
+                            alert(response.tips);
+                        }
+                        
+                    })
+            }
+            get_all_line();
+
+            if(typeof(linelist)=='undefined'){
+                linelist = [];
+            }
+            $scope.favit = function(key,lineid,siteid,e,linename,sitename){
+                stopBubble(e);
+                //弹出选项框 //
+                $('#roll').removeClass('hide');
+                $('#station_'+lineid+'_'+siteid).addClass('fontyellow');
+                makelidom();
+                lidom[2].css({
+                    'font-size':'15px',
+                    'color':'gray'
+                });
+                lidom[3].css({
+                    'font-size':'13px',
+                    'color':'gray'
+                });
+                collectname = lidom[1].text();
+                console.log(collectname+lidom[1]);
+                $scope.collect = {
+                    linename:linename,
+                    lineid:lineid,
+                    siteid:siteid,
+                    sitename:sitename,
+                    key:key
+                }
+                $scope.click = true;
+            }
+            $scope.scrollfunc = function(){
+                console.log('scroll');
+            }
+            $scope.showcar = function(linename,siteid,e){
+                stopBubble(e);
+               // $('.site').addClass('hide');
+               var thiscarname = $('#carname'+linename+'-'+siteid);
+               if(thiscarname.hasClass('hide')){
+                    thiscarname.removeClass('hide');
+               }else{
+                    thiscarname.addClass('hide');
+               }
+                
+            }
+            $scope.carfav = getstorge('carfav');
+            $scope.carfavlen = storge.carfavlen;
+            $scope.favname = '';
+            $scope.collect = {
+                lineid:0,
+                siteid:0,
+                linename:'',
+                sitename:'',
+                key:0
+            }
+            $scope.cancel_roll = function(){
+                
+                //取消时默认回第一个位置
+                var uls = $('#roll ul');
+                var ul = uls[0];
+                ul.scrollTop = 0;
+                $('#roll').addClass('hide');
+                console.log(!!1);
+                $('#station_'+$scope.collect.lineid+'_'+$scope.collect.siteid).removeClass('fontyellow');
+
+            }
+            $scope.confirmcollect = function(){
+
+                var thiscardata = storge.cardata[collectname];
+                var pushflag = false;//是否已经修改了内容
+                var cardata_data = {};
+                var key = $scope.collect.key;
+                if($scope.linelist[key]['StartEndSites'][0]['Seq'] == 1){
+                    cardata_data['startname'] = $scope.linelist[key]['StartEndSites'][0]['SiteName'];
+                    cardata_data['endname'] = $scope.linelist[key]['StartEndSites'][1]['SiteName'];
+
+                }else{
+                    cardata_data['startname'] = $scope.linelist[key]['StartEndSites'][1]['SiteName'];
+                    cardata_data['endname'] = $scope.linelist[key]['StartEndSites'][0]['SiteName'];
+                }
+                if($scope.updown==1){
+                    cardata_data['starttime'] = $scope.linelist[key]['UpStartTime'];
+                    cardata_data['endtime'] = $scope.linelist[key]['UpEndTime'];
+                }else{
+                    cardata_data['starttime'] = $scope.linelist[key]['DownStartTime'];
+                    cardata_data['endtime'] = $scope.linelist[key]['DownEndTime'];
+                }
+                cardata_data['favseq'] = $scope.linelist[key]['Seq'];
+                for(ind in thiscardata){//判断是否已经存在这个路线了
+                    if(thiscardata[ind]['lineId'] == $scope.collect.lineid){
+                        storge.cardata[collectname][ind] = {"linename":$scope.collect.linename,"lineId":$scope.collect.lineid,"upDown":$scope.updown,"siteId":$scope.collect.siteid,'startname':cardata_data['startname'],"starttime":cardata_data['starttime'],"endname":cardata_data['endname'],"endtime":cardata_data['endtime'],'favname':$scope.collect.sitename,'favseq':cardata_data['favseq']};
+                        pushflag = true;
+                        break;
+                    }
+                }
+                if(!pushflag){
+                    storge.cardata[collectname].push({"linename":$scope.collect.linename,"lineId":$scope.collect.lineid,"upDown":$scope.updown,"siteId":$scope.collect.siteid,'startname':cardata_data['startname'],"starttime":cardata_data['starttime'],"endname":cardata_data['endname'],"endtime":cardata_data['endtime'],'favname':$scope.collect.sitename,'favseq':cardata_data['favseq']});
+                }                 
+                setstorge('cardata',storge.cardata);
+                popalert('已经将'+$scope.collect.linename+'-'+$scope.collect.sitename+'加入['+collectname+']中了',1,'好','');
+                $('#roll').addClass('hide');
+            }
+
+
+            $scope.click = false;
+        })
+        
+       
+    </script>
+    </body>
+</html>

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+         <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"/>
+        <base href="car" />
+        <link type="text/css" rel="stylesheet" href="./css/car.css">
+        <link type="text/css" rel="stylesheet" href="./css/detail.css">
+        <script src="./js/angular-1.4.6.mini.js"></script>
+        <script src="./jquery-1.10.1.min.js"></script>
+        <style>
+            .red{
+                color:red;
+            }
+           /* .showdetail{
+                height:400px;
+                display:block;
+            }
+            .showheight{
+                height:820px;
+            }*/
+           .circle{
+                background: #e48e98;
+                color: white;
+           }
+           
+        </style>
+    </head>
+
+    <body  ng-app="bodyApp" ng-controller="bodylist">
+        <div class="head2 font55  middlefont">
+            <a href="javascript:history.back(-1);" class="certerfont" style="width:15%">
+            <img src="images/a3.png"  style="width: 8px;"></a>
+            <div class="certerfont" style="width:70%">
+                <span >{{urlname}}</span><a class="twig-24 "  ng-click="changedirect()"> &#xe820;</a>
+            </div>
+            
+            <span class="twig-24 " style="width:15%" ng-click="enter_edit()">&#xe81a;</span>
+        </div>
+
+    <div  ng-repeat="(lk,lv) in linelist" ng-click="click = !click" class="content {{tocolorClass[lk]}} {{linecolorClass[lk]}}" ng-class="{showheight:click}"  id="content-{{lk}}">
+        <!-- <div class="color_div {{linecolorClass[lk]}}"></div> -->
+        <div class="left_div">
+            <h4 class="">{{lv.linename}}</h4>
+            <div class="font40 leftpadding18">
+
+                <p style="margin-bottom:10px">time:</p>
+                <span >{{lv.starttime}} ~ {{lv.endtime}}</span>
+            </div>
+       
+        </div>
+        <div  class="right_div">
+           <!--  <div class="right_div_depart">
+                 <div style="width:10px;float:left;padding:0 20px 0 20px">。<br>|<br>。</div> 
+                <div style="width: 80%;float: left;">
+                    <div class="line1"></div>
+                    <div class="circle_top left"></div> 
+                    <p class="">{{lv.startname}}</p>
+                    <div class="circle_top left"></div> 
+                    <p class="">{{lv.endname}}</p>
+                </div>
+               
+                <span class="twig-24" style="line-height: 200px;" ng-click="getonestation(lv.lineId,lv.upDown,lv.siteId)">&#xe820;</span>
+            </div> -->
+             <div class="right_div_depart">
+                <!-- <div style="width:10px;float:left;padding:0 20px 0 20px">。<br>|<br>。</div> -->
+                <div class="right_line">
+                    <div class="circle_top " style="margin-top:10px;"></div> 
+                    <div class="line1"></div>
+                    <div class="circle_top "></div>
+
+                </div>
+                 
+                <div style="height: 100%">
+                    <p class="left_sp " style="padding-top: 5%" id="startname_{{lk}}"  >{{lv.startname}}</p>
+                    <p class="left_sp " id="endname_{{lk}}">{{lv.endname}}</p>
+                    
+                </div>
+            </div>
+            <div class="right_div_depart right_div_depart_down">
+                <div class="right_div_down_left">
+                    <h4 class=" " >collect</h4>
+                    <h5>{{lv.favname}}</h5>
+                </div>
+                <div class="right_div_down_mid">
+                    <h4 class=" " >wait</h4>
+                    <h5>{{allstation[lv.lineId]['FirstBus']}}站</h5>
+                </div>
+                <div class="right_div_down_mid">
+                    <h4 class="  " >wait</h4>
+
+                    <h5>{{allstation[lv.lineId].SecondBus}}站</h5>
+                </div>
+                <!-- <div></div> -->
+            </div>
+        </div>
+        <div class="stationdiv"  ng-class="{showdetail:click}">
+        <ul class="station" style="width:{{stationCount[lv.lineId]}}px"  >
+
+            <li ng-repeat="x in station[lv.lineId]" >
+
+           <span class="twig-24 favit star hide" id="station_{{lv.lineId}}_{{x.SiteId}}" ng-click="favit(lk,lv.lineId,x.SiteId,$event,lv.linename,x.SiteName,lv.upDown)">&#xe835;</span>
+            <p ng-class="{choosed:x.BusList.length>0}">{{x.SiteName}}{{(x.BusList.length>1)? x.BusList.length:""}}
+        
+         <!--  {{(!next[lv.lineId]&&x.Seq>lv.favseq&&x.BusList.length>0)?(next[lv.lineId]=x.Seq-lv.favseq):""}}
+     
+          {{(next[lv.lineId]&&!next2[lv.lineId]&&x.Seq>lv.favseq&&x.BusList.length>0)?((x.BusList.length>1||next[lv.lineId]< (x.Seq-lv.favseq))?next2[lv.lineId]=x.Seq-lv.favseq:""):""}} -->
+            </p></li>
+
+            </ul>
+       
+        </div>
+    </div>
+     <div class="circle twig-24 tohome">
+        <a onclick="location.href='home.html'" style="font-size:15px;color:white">  &#xe81b;</a>
+    </div>
+    <!-- 两个状态加载中和已经加载好了 -->
+    <div class="circle twig-24 " ng-hide="load" style="bottom:100px;z-index:1" ng-click="getnewStation()">
+        &#xe81f;{{time|date:'HH:mm'}}
+    </div>
+    <div class="circle twig-24 " ng-hide="!load" style="bottom:100px;z-index:1" ng-click="getnewStation()">
+        加载中
+    </div>
+    <script type="text/javascript" src="js/common.js"></script>
+    <script>
+    // -webkit-transform: translateZ(-50px) rotateX(45deg);
+    // -moz-transform: translateZ(-50px) rotateY(45deg);
+    // -o-transform: translateZ(-50px) rotateY(45deg);
+    // transform: translateZ(-50px) rotateY(45deg);
+
+
+        $('.content').bind('click',function(){
+                var _this = e;
+                var openflag =( _this.offsetHeight>350);
+               if(!openflag){
+                   openit(_this);  
+                   openflag  = true;
+                }else{
+                    closeit(_this);          
+                }
+
+        });
+
+     
+        if(window.localStorage){
+        // alert('This browser supports localStorage');
+        }else{
+         alert('This browser does NOT support localStorage');
+        }
+        var bodyapp = angular.module('bodyApp', []);
+        bodyapp.config(['$locationProvider', function($locationProvider) {  
+          $locationProvider.html5Mode(true);  
+        }]);
+        bodyapp.controller("bodylist",function($scope,$http,$location){
+            var urlname = $location.search().name;
+            $scope.urlname = urlname;
+ 
+            var cardata = getstorge('cardata')||{};
+            var linelist = cardata[urlname];
+            if(typeof(linelist)=='undefined'){
+                linelist = [];
+            }
+            var linenum = linelist.length;
+            $scope.favit = function(key,lineid,siteid,e,linename,sitename){
+                var isup = 0;
+                if(arguments.length==7) isup = arguments[6];
+                var varlinelist =$scope.linelist;
+                var startend = varlinelist.StartEndSites;
+                var map = {key:key,lineid:lineid,siteid:siteid,e:e,linename:linename,sitename:sitename};
+                var collectit = new collect_func();
+
+               $scope = collectit.favit(map,$scope,$http);
+               console.log(varlinelist);
+               $('#cancelfav').bind('click',collectit.cancelfav);
+               var newcardata = varlinelist[0];
+                newcardata['upDown'] = isup;
+                
+               $('#confirmcollect').bind('click',{newcarlist:newcardata},collectit.confirmcollect);
+            }
+            $scope.enter_edit = function(){
+                $('.star').toggle();
+            }
+            $scope.getonestation = function(lineid,updown,siteid){
+             $http.get("car.php?lineId="+lineid+"&upDown="+updown+"&siteId="+siteid+"&type=1").success(function(response){
+                        if(response.state ==1){
+                            var list = response.data;
+                            var jlist = JSON.parse(list);
+                            var id = jlist.LineId;
+                            $scope.allstation[id] = jlist;
+                            $scope.station[id]=jlist.List;
+                            $scope.stationCount[id] = 100*jlist.List.length;
+                         
+                            var station = $scope.station;
+                            console.log($scope.station);
+                        }else{
+                            alert(response.tips);
+                        }
+                        
+                    })
+            }
+            $scope.changedirect = function(){
+                
+                $scope.stationCount ={};
+                $scope.station = {};
+                
+                var linenum =$scope.linelist.length;
+                for(i=0;i<linenum;i++){
+                   var up  = linelist[i].upDown==1?2:1;
+                   var startname = $('#startname_'+i);
+                   var endname = $('#endname_'+i);
+                   var tmp_startname = startname.text();
+                   var tmp_endname =endname.text();
+                   startname.text(tmp_endname);
+                   endname.text(tmp_startname);
+
+                   console.log();
+                   $scope.getonestation(linelist[i].lineId,up,linelist[i].siteId);
+                }
+                
+            }
+            $scope.getnewStation = function(){
+                var myDate=new Date();
+                $scope.time = myDate.getTime();
+                $scope.stationCount ={};
+                $scope.station = {};
+                $scope.allstation = {};
+                $scope.linecolorClass = new Array();
+                $scope.tocolorClass = new Array(),$scope.next={},$scope.next2={};
+                for(i=0;i<linenum;i++){
+                   $scope.getonestation(linelist[i].lineId,linelist[i].upDown,linelist[i].siteId);
+                  switch(i%3){
+                    case 0:
+                    $scope.linecolorClass.push("lineyellow");
+                    $scope.tocolorClass.push("cyellow");
+
+                    break;
+                    case 1:
+                    $scope.linecolorClass.push("linepurple");
+                    $scope.tocolorClass.push("cpurple");
+                    break;
+                    case 2:
+                    $scope.linecolorClass.push("linegreen");
+                    $scope.tocolorClass.push("cgreen");
+                    break;
+                  }
+
+                }
+                $scope.linelist = linelist;
+          
+                $scope.click = false;
+            }
+            $scope.getnewStation();
+
+
+            
+
+   
+
+        });
+        
+        //localStorage格式
+       // cardata=>[{"上班":[{lineid：150819093028190}，{upDown：1}{siteId：1}]},{}]；
+       // 
+      //  cardataRefreshTime=10s;
+     // {"上班":[{"lineid":150819093028190,"upDown":1,"siteId":1},{"lineid":140724022829709,"upDown":1,"siteId":1}]}
+    //  140724022829709
+    </script>
+    </body>
+</html>

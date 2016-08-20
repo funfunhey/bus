@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+          <script src="js/oridomi.min.js"></script>
+          <script src="js/ortest.js"></script>
+          <style type="text/css" >
+          .demo5{
+                background-image: url('./images/suit.jpg');
+                min-width: 30px;
+                min-height: 300px;
+                max-width: 50px;
+          }
+                 
+          </style>
+    </head>
+    <body>
+    <div id="demos">
+    <div class="demo demo5" style="background-image: url('./images/suit.jpg');"></div>
+        <div>
+          <div class="label">accordion(90)</div>
+          <div class="button" data-n="4">fold</div>
+        </div>
+        </div>
+    <script>
+        (function(){
+
+            var demos;
+            if(!OriDomi.isSupported){
+                alert("not support");
+            }
+            demos = [new OriDomi('.demo5'),{
+                vPanels:4,
+                ripple:false
+            } ];
+            demos[0].foldUp(90);
+            methods = ['accordion', 'stairs', 'curl', 'reveal', 'foldUp', 'ramp', 'twist', 'fracture'];
+            return document.getElementById('demos').addEventListener('click', function(e) {
+              var angle, el, method, n;
+              if ((el = e.target).className !== 'button') {
+                return;
+              }
+              n = el.getAttribute('data-n');
+              method = methods[Math.abs(Math.floor(Math.random() * methods.length - Math.random()))];
+              angle = Math.floor(Math.random() * 80 * (Math.random() > .5 ? -1 : 1));
+              angle = 180;
+              demos[0][method](method !== 'foldUp' ? angle : void 0);
+              if (method === 'foldUp') {
+                angle = '';
+              }
+              demos[0].twist(0);
+              demo0 = document.getElementsByClassName('demo');
+              console.log(demo0[0]);
+              return el.parentNode.getElementsByClassName('label')[0].innerHTML = method + "(" + angle + ")";
+            }, false);
+        }).call(this);
+         
+    </script>
+    </body>
+</html>

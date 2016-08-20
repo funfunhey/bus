@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <style>
+        body{
+            font-size:50px;
+            
+        }
+     .roll{   position: fixed;
+        bottom: 0px;
+        background-color: white;
+        width: 99%;
+        /*height: 50%;*/
+        z-index: 1000;
+        min-height:650px;
+        text-align: center;
+    }
+    .stateline{
+        position: absolute;
+        padding:10px;
+    }
+    .rollstate{
+            background-color: #FDFDFD;
+        height: 80px;
+        border: 1px solid #ccc;
+        padding: 20px;
+    }
+    .roll li{
+        padding: 15px 0;
+        line-height: 70px;
+    }
+    .roll ul{
+        overflow-y:scroll;
+        padding-left: 0;
+        height: 500px;
+    }
+    .topcover{
+        position: fixed;
+        width: 99%;
+        /*height: 250px;*/
+        background-color: rgba(255,255,255,0.5);
+        border-bottom: 1px solid #ccc;
+        bottom:250px;
+    }
+    .bottomcover{
+         position: fixed;
+        width: 99%;
+        height: 0px;
+        background-color: rgba(255,255,255,0.5);
+        border-top: 1px solid #ccc;
+        bottom:350px;
+
+    }
+    .gray{
+        color:gray;
+    }
+    .font40{
+        font-size:40px;
+    }
+    .font30{
+        font-size:30px;
+    }
+    .font50{
+        font-size:50px;
+    }
+
+    .cover{
+    background:rgba(0, 0, 0, 0.7);
+    position:fixed;
+    top: 0px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    display:block !important;
+}
+.popbox{
+    background: white;
+    width: 80%;
+    margin: 0 auto;
+    border-radius: 20px;
+}
+.popbox .opt{
+    display: inline-block;
+    width: 49%;
+    text-align: center;
+    border-top: 1px solid #aaa;
+    border-right: 1px solid #aaa;
+    padding: 30px 0px;
+    height: 80px;
+    font-size: 40px;
+}
+.popbox p{
+    padding: 50px 50px 0px;
+}
+</style>
+
+    </head>
+    <body>
+        <div class="roll">
+        <div class="rollstate">
+        <span style="left: 50px;"  class="stateline" >确定</span><span style="right: 50px;" class="stateline">取消</span>
+        </div>
+        <div class="topcover"></div>
+        <div class="bottomcover"></div>
+            <ul onscroll="scrollfunc(this,event)">
+            <li id="li0">&nbsp;</li>
+            <li id="li1">&nbsp;</li>
+                <li id="li2">上班</li>
+                <li id="li3">下班</li>
+                <li id="li4">上班</li>
+    <!--             <li>下班</li>
+                <li>上班</li>
+                <li>下班</li>
+                <li>上班</li>
+                <li>下班</li> -->
+            <li id="li5">&nbsp;</li>
+            <li id="li6">&nbsp;</li>
+            </ul>
+        </div>
+        <div class="cover">
+
+            <div class="popbox">
+            <span >&#xe807;</span>
+                <p>已经将9路-外马路中添加到[上班]中了！</p>
+                <span class="opt">跳转到[上班]</span><span class="opt">好</span>
+            </div>
+        </div>
+    <script>
+        var scrollfunc = function(e,ee){
+ 
+
+            // console.log(e.scrollTop);
+            var lastpos = e.scrollTop;
+            var timefunc = setTimeout(function(){
+                if(lastpos == e.scrollTop){//停止了滚动
+                    var midpos = Math.round((lastpos/100));
+                    e.scrollTop=Math.round(midpos*100);
+                }else{
+                    timefunc;
+                }
+
+            }, 100);
+
+             var midpos2 = Math.round((lastpos/100))+2;
+            for (var i = midpos2; i >= 0; i--) {
+                document.getElementById('li'+i).setAttribute('class', 'font30');
+            }
+            var nearpos = midpos2-1;
+            document.getElementById('li'+nearpos).setAttribute('class', 'font40');
+            nearpos2 = midpos2+1;
+            document.getElementById('li'+nearpos2).setAttribute('class', 'font40');
+                for (var i = 4; i > midpos2+1; i--) {
+                    document.getElementById('li'+i).setAttribute('class', 'font30');
+                }
+            document.getElementById('li'+midpos2).setAttribute('class', 'font50');
+        }
+    </script>
+    </body>
+</html>

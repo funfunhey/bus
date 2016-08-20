@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+         <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"/>
+        <base href="car" />
+        <link type="text/css" rel="stylesheet" href="./css/car.css">
+        <link type="text/css" rel="stylesheet" href="./css/detail.css">
+        <script src="./jquery-1.10.1.min.js"></script>
+        <script src="./js/angular-1.4.6.mini.js"></script>
+
+    </head>
+
+    <body  ng-app="bodyApp" ng-controller="bodylist" >
+
+<!--     <div class="head2 font55 certerfont middlefont">
+    <a href="car2.html">
+        <img src="images/a3.png" style="position: absolute;left: 50px;top: 50px;width: 30px;"></a>{{basicimf.LineName}}
+    </div> -->
+    <div class="head2 font55  middlefont">
+        <a href="javascript:history.back(-1);" class="certerfont" style="width:15%">
+        <img src="images/a3.png"  style="width: 8px;"></a>
+        <div class="certerfont" style="width:70%">
+            <span >{{basicimf.LineName}}</span><a class="twig-24 "  ng-click="jump()"> &#xe820;</a>
+        </div>
+        
+        <!-- <span class="twig-24 " style="width:15%">&#xe81a;</span> -->
+    </div>
+    <div  id="content-1"  class="content cyellow showheight" >
+        <div class="color_div color_yellow"></div>
+        <div class="left_div">
+            <h4 class="">{{basicimf.LineName}} </h4>
+            <div class="font40 leftpadding18">
+
+                <p style="margin-bottom:10px">time:</p>
+                <span ng-hide="isup">{{basicimf.UpStartTime}} ~ {{basicimf.UpEndTime}}</span>
+                <span ng-hide="!isup">{{basicimf.DownStartTime}} ~ {{basicimf.DownEndTime}}</span>
+            </div>
+          
+        </div>
+        <div  class="right_div">
+            <!-- <div class="right_div_depart">
+                
+                <div style="   float: left;width: 80%;">
+                <div class="line1"></div>
+
+                <div class="circle_top left"></div> 
+              <div class="circle_top left"></div> 
+
+                <p ng-hide="isup==1">{{startend[0]['SiteName']}}</p>
+                <p ng-hide="isup==2">{{startend[1]['SiteName']}}</p>
+                
+                <p ng-hide="isup==1">{{startend[1]['SiteName']}}</p>
+                <p ng-hide="isup==2">{{startend[0]['SiteName']}}</p>
+                </div>
+                  <div class="twig-24 change" ng-click="jump()">  &#xe820;</div>
+            </div> -->
+            <div class="right_div_depart">
+                <!-- <div style="width:10px;float:left;padding:0 20px 0 20px">。<br>|<br>。</div> -->
+                <div class="right_line">
+                    <div class="circle_top " style="margin-top:10px;"></div> 
+                    <div class="line1"></div>
+                    <div class="circle_top "></div>
+
+                </div>
+                 
+                <div style="height: 100%">
+                    <p ng-hide="isup==1" class="left_sp" style="padding-top: 5%"  >{{startend[0]['SiteName']}}</p>
+                    <p ng-hide="isup==2" class="left_sp" style="padding-top: 5%">{{startend[1]['SiteName']}}</p>
+                    <p ng-hide="isup==1" class="left_sp"  >{{startend[1]['SiteName']}}</p>
+                    <p ng-hide="isup==2" class="left_sp" >{{startend[0]['SiteName']}}</p>
+                    <!-- <div class="twig-24 change" >  &#xe820;</div> -->
+                </div>
+            </div>
+            <div class="right_div_depart right_div_depart_down">
+               <!--  <div class="right_div_down_left">
+                    <h4 class=" " >collect</h4>
+                    <h5>{{lv.favname}}</h5>
+                </div> -->
+               <!--  <div class="right_div_down_mid">
+                    <h4 class=" " >next</h4>
+                    <h5>{{next[lv.lineId]}}站</h5>
+                </div>
+                <div class="right_div_down_mid">
+                    <h4 class="  " >next2</h4>
+                    <h5>{{next2[lv.lineId]}}站</h5>
+                </div> -->
+                <!-- <div></div> -->
+                <div style="padding:20px 0px 0px 20px;">
+                    票价：{{basicimf.Fare}}
+                </div>
+            </div>
+        </div>
+        <div class="stationdiv showdetail">
+        <ul class="station"  style="width:{{basicimf.UpSiteNum*100}}px" >
+
+            <li ng-repeat="x in linedata.List" >
+            <span class="twig-24 favit" id="station_{{x.LineId}}_{{x.SiteId}}" ng-click="favit(0,x.LineId,x.SiteId,$event,x.LineName,x.SiteName,x.Seq)">&#xe835;</span>
+            <p ng-class="{choosed:x.BusList.length>0}">{{x.SiteName}}{{(x.BusList.length>1)? x.BusList.length:""}}
+        
+         
+            </p></li>
+
+            </ul>
+       
+        </div>
+    </div>
+
+    <div class="circle twig-24 tohome font15">
+      <a onclick="window.location='home.html'"  class="fontpink">  &#xe81b;</a>
+    </div>
+    <!-- 两个状态加载中和已经加载好了 -->
+    <div class="circle twig-24 " ng-hide="load" style="bottom:100px;z-index:1" ng-click="getnewStation()">
+        &#xe81f;{{time|date:'HH:mm'}}
+    </div>
+    <div class="circle twig-24 " ng-hide="!load" style="bottom:100px" ng-click="getnewStation()">
+        加载中
+    </div>
+
+    <script type="text/javascript" src="js/common.js"></script>
+    <script>
+        var bodyapp = angular.module('bodyApp', []);
+        bodyapp.config(['$locationProvider', function($locationProvider) {  
+          $locationProvider.html5Mode(true);  
+        }]);
+        bodyapp.controller("bodylist",function($scope,$http,$location){
+            //日期
+            var lineid = $location.search().lineId;
+            var isup = $location.search().isup||1;
+            $scope.isup =isup;
+            var isdown =isup==1?2:1;
+            // console.log($location.search('isup',isdown));
+            // var newlocation = $location.absUrl();
+            var newlocation = 'line.html?lineId='+lineid+"&isup="+isdown;
+
+            if(typeof(lineid) =='undefined'||!lineid){
+                alert('没有找到该路线');
+                return;
+            }
+            $scope.jump = function(){
+                location.href = newlocation;
+            }
+    
+
+     
+            $scope.linecolorClass = new Array();
+            $scope.tocolorClass = new Array();
+            $scope.load = false;
+            $scope.favit = function(key,lineid,siteid,e,linename,sitename){
+                var map = {key:key,lineid:lineid,siteid:siteid,e:e,linename:linename,sitename:sitename};
+                var collectit = new collect_func();
+               $scope = collectit.favit(map,$scope,$http);
+               $('#cancelfav').bind('click',collectit.cancelfav);
+               var newcardata = {};
+             //  "linename":collectmap.linename,
+            //     "lineId":collectmap.lineid,
+            //     "upDown":$scope.updown,
+            //     "siteId":collectmap.siteid,
+            //     'startname':cardata_data['startname'],
+            //     "starttime":cardata_data['starttime'],
+            //     "endname":cardata_data['endname'],
+            //     "endtime":cardata_data['endtime'],
+            //     'favname':collectmap.sitename,
+            //     'favseq':cardata_data['favseq']
+                newcardata['starttime'] = $scope.isup==1?$scope.basicimf.UpStartTime:$scope.basicimf.DownStartTime;
+                newcardata['endtime'] = $scope.isup==1?$scope.basicimf.UpEndTime:$scope.basicimf.DownEndTime;
+                //newcardata['startname'] = $scope.isup==$scope.StartEndSites[0]['upDown']?$scope.StartEndSites[0]['upDown']:$scope.basicimf.DownEndTime;
+                if($scope.startend[0]['Seq'] == 1){
+                    newcardata['startname'] = $scope.startend[0]['SiteName'];
+                    newcardata['endname'] = $scope.startend[1]['SiteName'];
+
+                }else{
+                    newcardata['startname'] = $scope.startend[1]['SiteName'];
+                    newcardata['endname'] = $scope.startend[0]['SiteName'];
+                }
+                newcardata['endtime'] = $scope.isup==1?$scope.basicimf.UpEndTime:$scope.basicimf.DownEndTime;
+                newcardata['endtime'] = $scope.isup==1?$scope.basicimf.UpEndTime:$scope.basicimf.DownEndTime;
+                newcardata['upDown'] = $scope.isup;
+                
+               $('#confirmcollect').bind('click',{newcarlist:newcardata},collectit.confirmcollect);
+            }
+//获取站点信息
+            $scope.getnewStation = function(){
+                //更新时间
+                var myDate=new Date();
+                $scope.time = myDate.getTime();
+                $scope.load = true;
+                $http.get("car.php?lineId="+lineid+"&upDown="+isup+"&siteId=1&type=1").success(function(response){
+                            if(response.state ==1){
+                                var list = response.data;
+                                var jlist = JSON.parse(list);
+                                $scope.linedata = jlist;  
+                                console.log($scope.linedata);                
+                            }else{
+                                alert(response.tips);
+                            }
+                            $scope.load = false;
+                })               
+            }
+            $scope.getnewStation();
+            //get all basic imformation
+            $http.get("car.php?type=3&lineId="+lineid).success(function(response){
+                        if(response.state ==1){
+                            var list = response.data;
+                            var jlist = JSON.parse(list);
+                           $scope.basicimf = jlist;
+                           console.log(jlist);
+                           $scope.startend = jlist.StartEndSites;
+                
+                         
+                        }else{
+                            alert(response.tips);
+                        }
+                        
+                    })
+            $scope.click = false;
+
+   
+
+        })
+        
+    </script>
+    </body>
+</html>
